@@ -1,4 +1,5 @@
 <?php
+
 // Fetch calendar data from a webcal URL and display upcoming events.
 
 function fetch_ics(string $url): ?string {
@@ -29,6 +30,7 @@ function unfold_ics_lines(string $data): array {
 function parse_ics(string $data): array {
     $events = [];
     $lines = unfold_ics_lines($data);
+
     $event = null;
     foreach ($lines as $line) {
         $line = trim($line);
@@ -36,6 +38,7 @@ function parse_ics(string $data): array {
             $event = [];
         } elseif ($line === 'END:VEVENT') {
             if ($event) {
+
                 $events[] = $event;
             }
             $event = null;
@@ -43,6 +46,7 @@ function parse_ics(string $data): array {
             list($name, $value) = explode(':', $line, 2);
             $propName = strtoupper(explode(';', $name, 2)[0]);
             $event[$propName] = $value;
+
         }
     }
     return $events;
@@ -61,6 +65,7 @@ function format_ics_datetime(string $value): string {
             $dt->setTimezone(new DateTimeZone(date_default_timezone_get()));
         }
         return $dt ? $dt->format('Y-m-d H:i') : $value;
+
     }
     return $value;
 }
@@ -68,12 +73,14 @@ function format_ics_datetime(string $value): string {
 $icalUrl = 'webcal://outlook.office365.com/owa/calendar/a70595e6fb2948d48e89e24db6618d47@sktelecom.com/2a53ebb31c5443e7a55589eaf556331714645327997896019143/S-1-8-274681949-3373596907-3888491435-2108270514/reachcalendar.ics';
 $icsData = fetch_ics($icalUrl);
 $events = $icsData ? parse_ics($icsData) : [];
+
 ?>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="utf-8">
     <title>일정 보기</title>
+
 </head>
 <body>
 <h1>일정</h1>
@@ -87,6 +94,7 @@ $events = $icsData ? parse_ics($icsData) : [];
         <?= htmlspecialchars(format_ics_datetime($e['DTSTART'] ?? '')) ?> ~
         <?= htmlspecialchars(format_ics_datetime($e['DTEND'] ?? '')) ?>
     </li>
+
 <?php endforeach; ?>
 </ul>
 <?php endif; ?>
